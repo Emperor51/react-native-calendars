@@ -232,13 +232,23 @@ const Calendar = (props: CalendarProps & ContextProp) => {
 
   const renderMonth = () => {
     const shouldShowSixWeeks = showSixWeeks && !hideExtraDays;
-    const days = page(currentMonth, firstDay, shouldShowSixWeeks);
+    const days: Date[] = page(currentMonth, firstDay, shouldShowSixWeeks);
+  
+    if (shouldShowSixWeeks && days.length === 35) {
+      const lastDate = new Date(days[days.length - 1]);
+      for (let i = 1; i <= 7; i++) {
+        const nextDate = new Date(lastDate);
+        nextDate.setDate(nextDate.getDate() + i);
+        days.push(new Date(nextDate));
+      }
+    }
+  
     const weeks: JSX.Element[] = [];
-
     while (days.length) {
+      if (weeks.length === 6 && shouldShowSixWeeks) break; 
       weeks.push(renderWeek(days.splice(0, 7), weeks.length));
     }
-
+  
     return <View style={style.current.monthView}>{weeks}</View>;
   };
 
